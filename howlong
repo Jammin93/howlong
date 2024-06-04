@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+
+import re
+import sys
+
+from datetime import datetime, timezone
+from functools import partial
+from textwrap import dedent
+
+from clipp import Command
+from clipp.core import fill_paragraph
+
+
+def to_datetime(value: str, option_name: str) -> datetime:
+    """
+    Convert a string representing a date with optional time part to a `datetime`
+    object.
+    """
+    pattern = re.compile(
+        r"([1-9][0-9]{3}-[0-1][0-9]-[0-3][0-9])"
+        r"(T[0-2][0-9]:[0-6][0-9]:[0-6][0-9])?"
+    )
+    matched = pattern.match(value)
+    if matched:
+        if matched.group(2) is None:
+            value += "T00:00:00"
+
+        try:
+            dt = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S").timestamp()
+            dt = datetime.fromtimestamp(dt, tz=timezone.utc)
+            return dt
+        except ValueError:
+            pass
+
+    err_msg = dedent("""\
+    ERROR: invalid argument '%s' supplied to %s.
+    Date and time strings must be supplied in the following format:
+    YYYY-MM-DD[Thh:mm:ss]
+    """
+    )
+    sys.exit(fill_paragraph(err_msg % (value, option_name)))
+
+
+def parse_args():
+    cmd = Command(epilogue=dedent("""\
+        Date Format: YYYY-MM-DD[Thh:mm:ss]
+            Y: year (as a four digit integer)
+            M: month
+            D: day
+            h: hour
+            m: minute
+            s: second"""
+    ))
+    cmd.add_parameter(
+        "start",
+        dtype=partial(to_datetime, option_name="start"),
+        help="The start date with optional time.",
+    )
+    cmd.add_option(
+        "--end",
+        dtype=partial(to_datetime, option_name="--end"),
+        default=datetime.now(tz=timezone.utc),
+        help="The end date with optional time.",
+    )
+    cmd.add_option(
+        "-u", "--unit",
+        choices=["weeks", "days", "hours", "minutes", "seconds"],
+        default="days",
+        help=dedent("""\
+        The unit of measurement. Can be one of:
+            weeks
+            days
+            hours
+            minutes
+            seconds
+        """)
+    )
+    cmd.add_binary_flag(
+        "--date-only",
+        help="Use the current date with no time part (i.e. T00:00:00)."
+    )
+    cmd.make_mutually_exclusive("--end", "--date-only")
+    args = cmd.parse()
+    return args
+
+
+def main():
+    args = parse_args()
+    unit = args.locals["howlong"]["unit"]
+    start = args.locals["howlong"]["start"]
+    end = args.locals["howlong"]["end"]
+    if args.locals["howlong"]["date_only"]:
+        end = end.replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+
+    delta = end - start
+    if unit == "weeks":
+        print(round(delta.days / 7, 2))
+    elif unit == "days":
+        print(round(delta.days + (delta.seconds / 86400), 2))
+    elif unit == "hours":
+        print((delta.days * 24) + (delta.seconds // 3600))
+    elif unit == "minutes":
+        print((delta.days * 1440) + (delta.seconds // 60))
+    else:
+        print(f"{delta.seconds}")
+
+
+if __name__ == "__main__":
+    main()
