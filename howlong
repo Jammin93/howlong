@@ -107,7 +107,7 @@ def main():
     elif unit == "minutes":
         print((delta.days * 1440) + (delta.seconds // 60))
     else:
-        print(f"{delta.seconds}")
+        print(delta.days * 86400 + delta.seconds)
 
 
 if __name__ == "__main__":
