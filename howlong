@@ -23,11 +23,21 @@ def to_datetime(value: str, option_name: str) -> datetime:
     matched = pattern.match(value)
     if matched:
         if matched.group(2) is None:
-            value += "T00:00:00"
+            value += "T00:00:00:00"
 
         try:
-            dt = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S").timestamp()
+            dt = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S:%f")
+            dt = dt.timestamp()
             dt = datetime.fromtimestamp(dt, tz=timezone.utc)
+            if matched.group(2) is None:
+                # Need to zero out non-date part after conversion to UTC.
+                dt = dt.replace(
+                    hour=0,
+                    minute=0,
+                    second=0,
+                    microsecond=0,
+                )
+
             return dt
         except ValueError:
             pass
