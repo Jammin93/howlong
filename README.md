@@ -27,6 +27,7 @@ We can use the `--end` option if we wish to provide a specific end date.
 howlong 1993-11-30 --end=2024-06-10
 11150.0
 ```
+
 We can also supply a different unit of measurement. Perhaps we wish to compute the time elapsed in hours.
 
 ```console
