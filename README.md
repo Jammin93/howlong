@@ -2,8 +2,8 @@ A simple command-line tool for computing the elapsed time between two dates.
 
 # Requirements
 
-OS: Linux/POSIX
-Python Version: >= Python 3.12
+**OS:** Linux/POSIX \
+**Python Version:** >= Python 3.12
 
 # Installation
 
