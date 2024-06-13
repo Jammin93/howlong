@@ -21,7 +21,7 @@ Determining the time elapsed between November 30th, 1993 and the current date, i
 howlong 1993-11-30
 ```
 
-We can modify the syntax slightly if we wish to provide a specific end date.
+We can use the `--end` option if we wish to provide a specific end date.
 
 ```console
 howlong 1993-11-30 --end=2024-06-10
