@@ -15,7 +15,7 @@ sudo ./setup.sh
 
 # Basic Usage
 
-Determin the time elapsed between November 30th, 1993 and the current date, in days.
+Determine the time elapsed between November 30th, 1993 and the current date, in days.
 
 ```console
 howlong 1993-11-30
