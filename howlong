@@ -119,6 +119,7 @@ def main():
     else:
         print(delta.days * 86400 + delta.seconds)
 
+    return 0
 
 if __name__ == "__main__":
-    main()
+    exit(main())
